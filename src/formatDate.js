@@ -8,44 +8,44 @@
  * @returns {string}
  */
 function formatDate(date, fromFormat, toFormat) {
-  // Find the separator in the input date string (either "-" or "/")
-  const separator = date.match(/[^0-9]/)[0];
+  // Identify the separator from the 'fromFormat' array
+  const fromSeparator = fromFormat[3];
 
-  // Split the date string based on the separator
-  const dateParts = date.split(separator);
+  // Split the input date based on the separator from the 'fromFormat'
+  const dateParts = date.split(fromSeparator);
 
-  // Initialize variables for year, month, and day
+  // Create variables to hold the year, month, and day
   let year, month, day;
 
-  // Map the parts of the date based on the fromFormat
+  // Extract year, month, and day based on the 'fromFormat'
   fromFormat.forEach((part, index) => {
-    if (part === 'YYYY') {
-      year = dateParts[index];
-    } else if (part === 'YY') {
-      const twoDigitYear = dateParts[index];
-      year = (parseInt(twoDigitYear, 10) < 30) ? '20' + twoDigitYear : '19' + twoDigitYear;
-    } else if (part === 'MM') {
-      month = dateParts[index];
-    } else if (part === 'DD') {
-      day = dateParts[index];
-    }
+    if (part === 'YYYY') year = dateParts[index];
+    if (part === 'YY') year = dateParts[index];
+    if (part === 'MM') month = dateParts[index];
+    if (part === 'DD') day = dateParts[index];
   });
 
-  // Create the new formatted date based on the toFormat array
-  let newDate = '';
-  toFormat.forEach((part, index) => {
-    if (part === 'YYYY') newDate += year;
-    if (part === 'YY') newDate += year.slice(2); // Use last 2 digits of the year
-    if (part === 'MM') newDate += month;
-    if (part === 'DD') newDate += day;
+  // Convert the year if it's in two digits (from 'YY' to 'YYYY')
+  if (year.length === 2) {
+    // Use 20YY if YY < 30, else use 19YY
+    year = parseInt(year) < 30 ? `20${year}` : `19${year}`;
+  } else if (year.length === 4) {
+    // Convert from YYYY to YY
+    year = year.slice(2);
+  }
 
-    // Add the separator between parts except for the last part
-    if (index < toFormat.length - 1) {
-      newDate += separator;
-    }
-  });
+  // Determine the output separator (use the separator from the input format)
+  const toSeparator = fromSeparator;
 
-  return newDate;
+  // Reformat the date based on the 'toFormat' array
+  const formattedDate = toFormat.map(format => {
+    if (format === 'YYYY') return year;
+    if (format === 'YY') return year.slice(2);
+    if (format === 'MM') return month;
+    if (format === 'DD') return day;
+  }).join(toSeparator);
+
+  return formattedDate;
 }
 
 module.exports = formatDate;
